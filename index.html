@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Pajak Reklame</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for Inter font and rounded corners */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .rounded-2xl {
+            border-radius: 1rem; /* 16px */
+        }
+        .rounded-xl {
+            border-radius: 0.75rem; /* 12px */
+        }
+        .rounded-lg {
+            border-radius: 0.5rem; /* 8px */
+        }
+        .rounded-md {
+            border-radius: 0.375rem; /* 6px */
+        }
+        .shadow-xl {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        .shadow-md {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .shadow-inner {
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        /* Custom modal for alerts */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 flex items-center justify-center p-4">
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-2xl border-t-4 border-blue-500">
+        <h1 class="text-3xl font-extrabold text-center text-gray-800 mb-8">
+            <span class="text-blue-600">Kalkulator</span> Pajak Reklame
+        </h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Bagian Input Reklame -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Detail Reklame</h2>
+                <div>
+                    <label for="jenisReklame" class="block text-sm font-medium text-gray-700 mb-1">
+                        Jenis Reklame
+                    </label>
+                    <select id="jenisReklame" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out">
+                        <option value="">Pilih Jenis Reklame</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="subType" class="block text-sm font-medium text-gray-700 mb-1">
+                        Sub-Tipe Reklame
+                    </label>
+                    <select id="subType" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out" disabled>
+                        <option value="">Pilih Sub-Tipe</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="duration" class="block text-sm font-medium text-gray-700 mb-1">
+                        Jangka Waktu
+                    </label>
+                    <select id="duration" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out" disabled>
+                        <option value="">Pilih Jangka Waktu</option>
+                    </select>
+                </div>
+
+                <!-- Input Panjang dan Lebar atau Ukuran Tunggal -->
+                <div id="ukuranInputContainer">
+                    <!-- Content will be dynamically loaded here -->
+                </div>
+            </div>
+
+            <!-- Bagian Input Lokasi -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Detail Lokasi (NSL)</h2>
+                <div>
+                    <label for="kawasan" class="block text-sm font-medium text-gray-700 mb-1">
+                        Kawasan
+                    </label>
+                    <select id="kawasan" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out">
+                        <option value="">Pilih Kawasan</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="sudutPandang" class="block text-sm font-medium text-gray-700 mb-1">
+                        Sudut Pandang
+                    </label>
+                    <select id="sudutPandang" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out">
+                        <option value="">Pilih Sudut Pandang</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="kelasJalan" class="block text-sm font-medium text-gray-700 mb-1">
+                        Kelas Jalan
+                    </label>
+                    <select id="kelasJalan" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out">
+                        <option value="">Pilih Kelas Jalan</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button id="calculateTaxBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
+            Hitung Pajak Reklame
+        </button>
+
+        <div id="resultContainer" class="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-xl text-center shadow-inner hidden">
+            <h2 class="text-2xl font-bold text-blue-800 mb-3">Pajak Reklame Terutang:</h2>
+            <p id="pajakTerutangValue" class="text-4xl font-extrabold text-blue-700"></p>
+        </div>
+    </div>
+
+    <!-- Custom Modal Structure -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <p id="modalMessage" class="text-lg text-gray-800"></p>
+            <button onclick="document.getElementById('myModal').style.display = 'none'" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md">OK</button>
+        </div>
+    </div>
+
+
+    <script>
+        // Data Harga Satuan Final dari HARGA SATUAN FINAL.csv
+        const hargaSatuanData = [
+          {
+            jenisReklame: "REKLAME PAPAN",
+            subTypes: [
+              {
+                name: "Bilboard",
+                durations: [
+                  { period: "s/d 3 bulan", unit: "m2", hargaSatuan: 165000 },
+                  { period: "Diatas 3 bulan s/d 6 bulan", unit: "m2", hargaSatuan: 192500 },
+                  { period: "Diatas 6 bulan s/d 1 tahun", unit: "m2", hargaSatuan: 220000 },
+                ],
+              },
+              {
+                name: "Megatron",
+                durations: [
+                  { period: "s/d 3 bulan", unit: "m2", hargaSatuan: 137500 },
+                  { period: "Diatas 3 bulan s/d 6 bulan", unit: "m2", hargaSatuan: 165000 },
+                  { period: "Diatas 6 bulan s/d 1 tahun", unit: "m2", hargaSatuan: 220000 },
+                ],
+              },
+              {
+                name: "Videotron",
+                durations: [
+                  { period: "Jenis Tanyangan/Hari (SKPD Kab. Sidrap)", unit: "Hari", hargaSatuan: 2200 },
+                  { period: "Jenis Tanyangan/Hari (SKPD Provinsi)", unit: "Hari", hargaSatuan: 3300 },
+                  { period: "Jenis Tanyangan/Hari (Instansi Vertikal)", unit: "Hari", hargaSatuan: 3300 },
+                  { period: "Jenis Tanyangan/Hari (BUMN)", unit: "Hari", hargaSatuan: 11000 },
+                  { period: "Jenis Tanyangan/Hari (BUMD)", unit: "Hari", hargaSatuan: 5500 },
+                  { period: "Jenis Tanyangan/Hari (Perusahaan Skala Nasional)", unit: "Hari", hargaSatuan: 16500 },
+                  { period: "Jenis Tanyangan/Hari (Perusahaan Skala Daerah)", unit: "Hari", hargaSatuan: 7700 },
+                  { period: "Jenis Tanyangan/Hari (Lembaga Swasta)", unit: "Hari", hargaSatuan: 8800 },
+                  { period: "Jenis Tanyangan/Hari (Organisasi)", unit: "Hari", hargaSatuan: 5500 },
+                  { period: "Jenis Tanyangan/Hari (Perseorangan)", unit: "Hari", hargaSatuan: 11000 },
+                  { period: "Jenis Tanyangan/Hari (UMKM)", unit: "Hari", hargaSatuan: 3300 },
+                ],
+              },
+              {
+                name: "Dynamic Wall",
+                durations: [
+                  { period: "s/d 3 bulan", unit: "m2", hargaSatuan: 220000 },
+                  { period: "Diatas 3 bulan s/d 6 bulan", unit: "m2", hargaSatuan: 330000 },
+                  { period: "Diatas 6 bulan s/d 1 tahun", unit: "m2", hargaSatuan: 440000 },
+                ],
+              },
+              {
+                name: "Neon Sign/Neon Box/Timplate/Shop Sign",
+                durations: [
+                  { period: "s/d 3 bulan", unit: "m2", hargaSatuan: 137500 },
+                  { period: "Diatas 3 bulan s/d 6 bulan", unit: "m2", hargaSatuan: 165000 },
+                  { period: "Diatas 6 bulan s/d 1 tahun", unit: "m2", hargaSatuan: 220000 },
+                ],
+              },
+              {
+                name: "Pengecetan dinding",
+                durations: [{ period: "1 Tahun", unit: "m2", hargaSatuan: 137500 }],
+              },
+            ],
+          },
+          {
+            jenisReklame: "REKLAME KAIN/PLASTIK/MIKA",
+            subTypes: [
+              {
+                name: "Spanduk /umbul-umbul/banner, dan sejenisnya",
+                durations: [
+                  { period: "1 kali pasang lama 7 hari", unit: "m2", hargaSatuan: 55000 },
+                  { period: "1 kali pasang lama 30 hari", unit: "m2", hargaSatuan: 82500 },
+                  { period: "1 kali pasang lama 3 bln", unit: "m2", hargaSatuan: 110000 },
+                  { period: "1 kali pasang lama diatas 3 bln s/d 1 tahun", unit: "m2", hargaSatuan: 220000 },
+                ],
+              },
+              {
+                name: "Baliho",
+                durations: [
+                  { period: "Rangka sederhana (terbuat dari kayu/bambu) s/d 3 bulan", unit: "m2", hargaSatuan: 78750 },
+                  { period: "Rangka sederhana (terbuat dari kayu/bambu) Diatas 3 bulan s/d 6 bulan", unit: "m2", hargaSatuan: 110000 },
+                  { period: "Rangka sederhana (terbuat dari kayu/bambu) Diatas 6 bulan s/d 1 tahun", unit: "m2", hargaSatuan: 137500 },
+                  { period: "Rangka sedang (terbuat dari besi) s/d 3 bulan", unit: "m2", hargaSatuan: 110000 },
+                  { period: "Rangka sedang (terbuat dari besi) Diatas 3 bulan s/d 6 bulan", unit: "m2", hargaSatuan: 137500 },
+                  { period: "Rangka sedang (terbuat dari besi) Diatas 6 bulan s/d 1 tahun", unit: "m2", hargaSatuan: 165000 },
+                  { period: "Rangkah Mewah (terbuat dari besi ditambah lampu sorot) s/d 3 bulan", unit: "m2", hargaSatuan: 137500 },
+                  { period: "Rangkah Mewah (terbuat dari besi ditambah lampu sorot) Diatas 3 bulan s/d 6 bulan", unit: "m2", hargaSatuan: 165000 },
+                  { period: "Rangkah Mewah (terbuat dari besi ditambah lampu sorot) Diatas 6 bulan s/d 1 tahun", unit: "m2", hargaSatuan: 220000 },
+                ],
+              },
+            ],
+          },
+          {
+            jenisReklame: "REKLAME SELEBARAN",
+            subTypes: [{ name: "Leaflet", durations: [{ period: "1 kali", unit: "lembar", hargaSatuan: 5500 }] }],
+          },
+          {
+            jenisReklame: "REKLAME MELEKAT (stiker)",
+            subTypes: [{ name: "Sticker", durations: [{ period: "1 kali", unit: "lembar", hargaSatuan: 11000 }] }],
+          },
+          {
+            jenisReklame: "REKLAME BERJALAN",
+            subTypes: [
+              { name: "Pada Kendaraan yang bergambar", durations: [{ period: "1 Tahun", unit: "m2", hargaSatuan: 165000 }] },
+              {
+                name: "Pada Kendaraan Non Gambar",
+                durations: [
+                  { period: "Roda sepuluh (kontener, truk & sejenisnya) 1 Tahun", unit: "m2", hargaSatuan: 25300 },
+                  { period: "Roda Enam (Mobil Box/truk & sejenisnya) 1 Tahun", unit: "m2", hargaSatuan: 24200 },
+                  { period: "Roda Empat (Mobil Box/truk & sejenisnya) 1 Tahun", unit: "m2", hargaSatuan: 22000 },
+                ],
+              },
+            ],
+          },
+          {
+            jenisReklame: "REKLAME UDARA",
+            subTypes: [{ name: "Airborne", durations: [{ period: "s/d 1 bulan", unit: "buah", hargaSatuan: 550000 }] }],
+          },
+          {
+            jenisReklame: "REKLAME SUARA",
+            subTypes: [
+              { name: "Sound Advertisement", durations: [{ period: "1 kegiatan", unit: "hari", hargaSatuan: 220000 }] },
+              {
+                name: "Usaha Penjualan yang memakai kendaraan Roda 4 (empat)",
+                durations: [
+                  { period: "Kebutuhan Pokok 1 Tahun", unit: "usaha Perdagangan", hargaSatuan: 110000 },
+                  { period: "Dan Usaha lainnya 1 Tahun", unit: "usaha Perdagangan", hargaSatuan: 110000 },
+                ],
+              },
+            ],
+          },
+          {
+            jenisReklame: "REKLAME PERAGAAN",
+            subTypes: [
+              {
+                name: "Toko/Usah yang tidak secara nyata memasang reklame atl",
+                durations: [
+                  { period: "Ruko/Toko 1 Tahun", unit: "usaha Perdagangan", hargaSatuan: 165000 },
+                  { period: "Gardu/Kios 1 Tahun", unit: "usaha Perdagangan", hargaSatuan: 137500 },
+                  { period: "Jenis Usaha lainnya 1 Tahun", unit: "usaha Perdagangan", hargaSatuan: 82500 },
+                ],
+              },
+              { name: "Peragaan/Demostrasi Produk atau barang (Insedentil)", durations: [{ period: "1 kegiatan", unit: "hari", hargaSatuan: 220000 }] },
+            ],
+          },
+          {
+            jenisReklame: "REKLAME FILM/SLIDE",
+            subTypes: [{ name: "Film/Slide", durations: [{ period: "1 kegiatan", unit: "hari", hargaSatuan: 165000 }] }],
+          },
+        ];
+
+        // Data untuk Nilai Strategis Lokasi (NSL) dari NILAI STRTEGIS LOKASI.csv
+        const strategicLocationData = {
+          kawasan: [
+            { name: "KAWASAN HIJAU DAN TAMAN KOTA", indeks: 3 },
+            { name: "PERTOKOAN", indeks: 2.7 },
+            { name: "DIPASAR/TERMINAL ATAU SEKITARNYA (RADIUS 50 M)", indeks: 2.4 },
+            { name: "DILAPANGAN/TEMPAT WISATA ATAU SEKITARNYA (RADIUS 50 M)", indeks: 2.1 },
+            { name: "LAINNYA", indeks: 1.8 },
+          ],
+          sudutPandang: [
+            { name: "PERSIMPANGAN 4", indeks: 3 },
+            { name: "PERSIMPANGAN 3", indeks: 2.4 },
+            { name: "JALAN 2 ARAH", indeks: 1.8 },
+            { name: "JALAN 1 ARAH", indeks: 1.2 },
+          ],
+          kelasJalan: [
+            { name: "JALAN NASIONAL", indeks: 2 },
+            { name: "JALAN PROVINSI", indeks: 1.8 },
+            { name: "JALAN KABUPATEN", indeks: 1.6 },
+            { name: "JALAN KOTA", indeks: 1.4 },
+            { name: "JALAN DESA", indeks: 1.2 },
+          ],
+        };
+
+        // DOM Elements
+        const jenisReklameSelect = document.getElementById('jenisReklame');
+        const subTypeSelect = document.getElementById('subType');
+        const durationSelect = document.getElementById('duration');
+        const ukuranInputContainer = document.getElementById('ukuranInputContainer');
+        const kawasanSelect = document.getElementById('kawasan');
+        const sudutPandangSelect = document.getElementById('sudutPandang');
+        const kelasJalanSelect = document.getElementById('kelasJalan');
+        const calculateTaxBtn = document.getElementById('calculateTaxBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        const pajakTerutangValue = document.getElementById('pajakTerutangValue');
+
+        // Modal elements
+        const modal = document.getElementById('myModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const closeButton = document.getElementsByClassName('close-button')[0];
+
+        let currentUnitLabel = 'Unit';
+
+        // Function to show custom alert modal
+        function showAlert(message) {
+            modalMessage.textContent = message;
+            modal.style.display = 'flex'; // Use flex to center
+        }
+
+        // Close modal when close button is clicked
+        closeButton.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        // Close modal when clicking outside of the modal content
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Populate Jenis Reklame dropdown
+        function populateJenisReklame() {
+            hargaSatuanData.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.jenisReklame;
+                option.textContent = item.jenisReklame;
+                jenisReklameSelect.appendChild(option);
+            });
+        }
+
+        // Populate Sub-Type dropdown based on selected Jenis Reklame
+        function populateSubType() {
+            subTypeSelect.innerHTML = '<option value="">Pilih Sub-Tipe</option>';
+            subTypeSelect.disabled = true;
+            durationSelect.innerHTML = '<option value="">Pilih Jangka Waktu</option>';
+            durationSelect.disabled = true;
+            updateUkuranInput(''); // Clear and reset input fields
+
+            const selectedJenis = jenisReklameSelect.value;
+            if (selectedJenis) {
+                const selectedJenisData = hargaSatuanData.find(item => item.jenisReklame === selectedJenis);
+                if (selectedJenisData && selectedJenisData.subTypes.length > 0) {
+                    selectedJenisData.subTypes.forEach(sub => {
+                        const option = document.createElement('option');
+                        option.value = sub.name;
+                        option.textContent = sub.name;
+                        subTypeSelect.appendChild(option);
+                    });
+                    subTypeSelect.disabled = false;
+                }
+            }
+        }
+
+        // Populate Duration dropdown based on selected Sub-Type
+        function populateDuration() {
+            durationSelect.innerHTML = '<option value="">Pilih Jangka Waktu</option>';
+            durationSelect.disabled = true;
+            updateUkuranInput(''); // Clear and reset input fields
+
+            const selectedJenis = jenisReklameSelect.value;
+            const selectedSubType = subTypeSelect.value;
+
+            if (selectedJenis && selectedSubType) {
+                const selectedJenisData = hargaSatuanData.find(item => item.jenisReklame === selectedJenis);
+                const selectedSubTypeData = selectedJenisData?.subTypes.find(sub => sub.name === selectedSubType);
+
+                if (selectedSubTypeData && selectedSubTypeData.durations.length > 0) {
+                    selectedSubTypeData.durations.forEach(d => {
+                        const option = document.createElement('option');
+                        option.value = d.period;
+                        option.textContent = d.period;
+                        durationSelect.appendChild(option);
+                    });
+                    durationSelect.disabled = false;
+                }
+            }
+        }
+
+        // Update Ukuran/Luas input fields based on selected duration unit
+        function updateUkuranInput(unit) {
+            currentUnitLabel = unit || 'Unit';
+            let htmlContent = '';
+
+            if (currentUnitLabel === 'm2') {
+                htmlContent = `
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="panjang" class="block text-sm font-medium text-gray-700 mb-1">
+                                Panjang (m)
+                            </label>
+                            <input
+                                type="number"
+                                id="panjang"
+                                class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out"
+                                value=""
+                                placeholder="Masukkan Panjang"
+                                min="0"
+                                step="any"
+                                ${!durationSelect.value ? 'disabled' : ''}
+                            />
+                        </div>
+                        <div>
+                            <label for="lebar" class="block text-sm font-medium text-gray-700 mb-1">
+                                Lebar (m)
+                            </label>
+                            <input
+                                type="number"
+                                id="lebar"
+                                class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out"
+                                value=""
+                                placeholder="Masukkan Lebar"
+                                min="0"
+                                step="any"
+                                ${!durationSelect.value ? 'disabled' : ''}
+                            />
+                        </div>
+                    </div>
+                `;
+            } else {
+                htmlContent = `
+                    <div>
+                        <label for="ukuran" class="block text-sm font-medium text-gray-700 mb-1">
+                            Jumlah / ${currentUnitLabel}
+                        </label>
+                        <input
+                            type="number"
+                            id="ukuran"
+                            class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out"
+                            value=""
+                            placeholder="Masukkan Jumlah ${currentUnitLabel}"
+                            min="0"
+                            step="any"
+                            ${!durationSelect.value ? 'disabled' : ''}
+                        />
+                    </div>
+                `;
+            }
+            ukuranInputContainer.innerHTML = htmlContent;
+        }
+
+        // Populate Location dropdowns
+        function populateLocationData() {
+            strategicLocationData.kawasan.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.name;
+                option.textContent = `${item.name} (Indeks: ${item.indeks})`;
+                kawasanSelect.appendChild(option);
+            });
+
+            strategicLocationData.sudutPandang.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.name;
+                option.textContent = `${item.name} (Indeks: ${item.indeks})`;
+                sudutPandangSelect.appendChild(option);
+            });
+
+            strategicLocationData.kelasJalan.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.name;
+                option.textContent = `${item.name} (Indeks: ${item.indeks})`;
+                kelasJalanSelect.appendChild(option);
+            });
+        }
+
+        // Main Calculation Function
+        function calculateTax() {
+            const selectedJenisReklame = jenisReklameSelect.value;
+            const selectedSubType = subTypeSelect.value;
+            const selectedDuration = durationSelect.value;
+            const selectedKawasan = kawasanSelect.value;
+            const selectedSudutPandang = sudutPandangSelect.value;
+            const selectedKelasJalan = kelasJalanSelect.value;
+
+            if (!selectedJenisReklame || !selectedSubType || !selectedDuration || !selectedKawasan || !selectedSudutPandang || !selectedKelasJalan) {
+                showAlert("Harap lengkapi semua pilihan di formulir.");
+                resultContainer.classList.add('hidden');
+                return;
+            }
+
+            let hargaSatuan = 0;
+            let calculatedArea = 0;
+
+            // Get Harga Satuan
+            const selectedJenisData = hargaSatuanData.find(item => item.jenisReklame === selectedJenisReklame);
+            const selectedSubTypeData = selectedJenisData?.subTypes.find(sub => sub.name === selectedSubType);
+            const selectedDurationData = selectedSubTypeData?.durations.find(d => d.period === selectedDuration);
+
+            if (selectedDurationData) {
+                hargaSatuan = selectedDurationData.hargaSatuan;
+            } else {
+                showAlert("Data harga satuan tidak ditemukan untuk pilihan yang dipilih.");
+                resultContainer.classList.add('hidden');
+                return;
+            }
+
+            // Calculate NSL Index Sum
+            const kawasanIndeks = strategicLocationData.kawasan.find(k => k.name === selectedKawasan)?.indeks || 0;
+            const sudutPandangIndeks = strategicLocationData.sudutPandang.find(s => s.name === selectedSudutPandang)?.indeks || 0;
+            const kelasJalanIndeks = strategicLocationData.kelasJalan.find(kj => kj.name === selectedKelasJalan)?.indeks || 0;
+            const nslIndeksSum = kawasanIndeks + sudutPandangIndeks + kelasJalanIndeks;
+
+            if (nslIndeksSum === 0) {
+                showAlert("Harap pilih semua detail lokasi (Kawasan, Sudut Pandang, Kelas Jalan).");
+                resultContainer.classList.add('hidden');
+                return;
+            }
+
+            // Calculate Area/Quantity
+            if (currentUnitLabel === 'm2') {
+                const panjangInput = document.getElementById('panjang');
+                const lebarInput = document.getElementById('lebar');
+                const parsedPanjang = parseFloat(panjangInput.value);
+                const parsedLebar = parseFloat(lebarInput.value);
+
+                if (isNaN(parsedPanjang) || parsedPanjang <= 0 || isNaN(parsedLebar) || parsedLebar <= 0) {
+                    showAlert("Panjang dan Lebar harus angka positif untuk unit m2.");
+                    resultContainer.classList.add('hidden');
+                    return;
+                }
+                calculatedArea = parsedPanjang * parsedLebar;
+            } else {
+                const ukuranInput = document.getElementById('ukuran');
+                const parsedUkuran = parseFloat(ukuranInput.value);
+
+                if (isNaN(parsedUkuran) || parsedUkuran <= 0) {
+                    showAlert(`Input Jumlah / ${currentUnitLabel} harus angka positif.`);
+                    resultContainer.classList.add('hidden');
+                    return;
+                }
+                calculatedArea = parsedUkuran;
+            }
+
+            // Calculation based on provided image:
+            // NSR = Ukuran * Tarif * NSL_Indeks_Sum
+            const nsr = calculatedArea * hargaSatuan * nslIndeksSum;
+
+            // Pajak Reklame Terutang = NSR * 25%
+            const calculatedTax = nsr * 0.25;
+
+            pajakTerutangValue.textContent = `Rp ${calculatedTax.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+            resultContainer.classList.remove('hidden');
+        }
+
+        // Event Listeners
+        jenisReklameSelect.addEventListener('change', populateSubType);
+        subTypeSelect.addEventListener('change', populateDuration);
+        durationSelect.addEventListener('change', () => {
+            const selectedJenis = jenisReklameSelect.value;
+            const selectedSubType = subTypeSelect.value;
+            const selectedDuration = durationSelect.value;
+
+            const selectedJenisData = hargaSatuanData.find(item => item.jenisReklame === selectedJenis);
+            const selectedSubTypeData = selectedJenisData?.subTypes.find(sub => sub.name === selectedSubType);
+            const selectedDurationData = selectedSubTypeData?.durations.find(d => d.period === selectedDuration);
+
+            if (selectedDurationData) {
+                updateUkuranInput(selectedDurationData.unit);
+            } else {
+                updateUkuranInput('');
+            }
+        });
+        calculateTaxBtn.addEventListener('click', calculateTax);
+
+        // Initial population on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            populateJenisReklame();
+            populateLocationData();
+            updateUkuranInput(''); // Initialize with empty input
+        });
+    </script>
+</body>
+</html>
